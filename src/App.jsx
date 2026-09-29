@@ -1,13 +1,24 @@
-import React from 'react';
-import { MapPin, ShoppingBag, Search, Truck, Utensils, Store, Compass, Info } from 'lucide-react';
-
-import React, { useState } from 'react';
-import { MapPin, ShoppingBag, Search, Truck, Utensils, Store, Compass, Info, CheckCircle, UserPlus, X } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { MapPin, ShoppingBag, Search, Truck, Utensils, Store, Compass, Info, CheckCircle, UserPlus, X, Sun, Moon, Cloud, Sparkles } from 'lucide-react';
 
 export default function App() {
   const [isConnected, setIsConnected] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({ name: '', phone: '', role: 'Cliente / Morador' });
+  
+  // Modo do cabeçalho dinâmico: 'auto', 'day', 'night'
+  const [timeMode, setTimeMode] = useState('auto');
+  const [isNightTime, setIsNightTime] = useState(false);
+
+  useEffect(() => {
+    if (timeMode === 'auto') {
+      const hour = new Date().getHours();
+      // Noite entre 18h e 6h
+      setIsNightTime(hour < 6 || hour >= 18);
+    } else {
+      setIsNightTime(timeMode === 'night');
+    }
+  }, [timeMode]);
 
   const categories = [
     { name: 'Delivery', icon: <Utensils className="w-6 h-6" /> },
@@ -26,109 +37,278 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] text-[#2D4A3E]">
-      <header className="p-4 bg-white shadow-sm sticky top-0 z-10">
-        <div className="flex justify-between items-center mb-4">
-          <h1 className="text-xl font-bold text-[#1B3A2E]">Xandó Express</h1>
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1 text-sm font-medium text-gray-600">
-              <MapPin className="w-4 h-4 text-[#2D4A3E]" /> Xandó
+    <div className={`min-h-screen transition-colors duration-700 ${
+      isNightTime 
+        ? 'bg-[#0f172a] text-[#f8fafc]' 
+        : 'bg-[#FDFBF7] text-[#3D3A32]'
+    }`}>
+      {/* HEADER DINÂMICO DIA / NOITE */}
+      <header className={`relative overflow-hidden shadow-md transition-all duration-700 ${
+        isNightTime
+          ? 'bg-gradient-to-b from-[#1e293b] via-[#0f172a] text-white border-b border-slate-800'
+          : 'bg-gradient-to-b from-[#e0f2fe] via-[#fef3c7] to-[#FDFBF7] text-[#2D4A3E] border-b border-amber-100'
+      }`}>
+        
+        {/* ELEMENTOS ANIMADOS DE FUNDO */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          {isNightTime ? (
+            <div className="absolute inset-0">
+              {/* Estrelas sutis */}
+              <div className="absolute top-4 left-10 text-amber-200/60 animate-pulse text-xs">✦</div>
+              <div className="absolute top-10 right-20 text-blue-200/70 animate-pulse text-xs" style={{ animationDuration: '3s' }}>✦</div>
+              <div className="absolute top-6 right-40 text-white/50 text-[10px]">★</div>
+              
+              {/* Nuvens Noturnas Animadas em Loop */}
+              <div className="absolute top-4 w-full flex animate-[slideCloud_25s_linear_infinite] opacity-30 text-white gap-32">
+                <Cloud className="w-24 h-12" />
+                <Cloud className="w-32 h-16" />
+              </div>
             </div>
-            {isConnected ? (
-              <span className="flex items-center gap-1 bg-green-100 text-green-800 text-xs px-2.5 py-1 rounded-full font-semibold">
-                <CheckCircle className="w-3.5 h-3.5" /> Conectado
-              </span>
-            ) : (
-              <button 
-                onClick={() => setIsModalOpen(true)}
-                className="flex items-center gap-1 bg-[#2D4A3E] text-white text-xs px-3 py-1.5 rounded-full font-semibold hover:bg-[#1B3A2E] transition-all"
-              >
-                <UserPlus className="w-3.5 h-3.5" /> Conectar ao Hub
-              </button>
-            )}
-          </div>
+          ) : (
+            <div className="absolute inset-0">
+              {/* Raios de Sol Suaves e Sol Animado */}
+              <div className="absolute -top-12 -right-12 w-48 h-48 bg-amber-300/30 rounded-full blur-2xl animate-pulse"></div>
+            </div>
+          )}
         </div>
-        <div className="relative">
-          <Search className="absolute left-3 top-3 text-gray-400 w-5 h-5" />
-          <input type="text" placeholder="O que procura hoje?" className="w-full pl-10 pr-4 py-2 rounded-full bg-[#F0F4F2] outline-none" />
+
+        <div className="relative z-10 p-4 max-w-4xl mx-auto">
+          {/* Barra Superior / Controles */}
+          <div className="flex justify-between items-center mb-4">
+            <div className="flex items-center gap-2">
+              <div className={`p-2 rounded-2xl shadow-sm ${
+                isNightTime ? 'bg-indigo-950/80 text-amber-300' : 'bg-amber-100 text-amber-600'
+              }`}>
+                {isNightTime ? <Moon className="w-6 h-6 animate-pulse" /> : <Sun className="w-6 h-6 animate-[spin_12s_linear_infinite]" />}
+              </div>
+              <div>
+                <h1 className="text-xl font-bold tracking-tight">Xandó Express</h1>
+                <p className={`text-xs ${isNightTime ? 'text-slate-300' : 'text-amber-900/70'}`}>Caraíva & Xandó - BA</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              {/* Alternador de Modo Diurno / Noturno */}
+              <div className={`flex items-center p-1 rounded-full border text-xs ${
+                isNightTime ? 'bg-slate-900/80 border-slate-700 text-slate-300' : 'bg-white/80 border-amber-200 text-amber-900'
+              }`}>
+                <button 
+                  onClick={() => setTimeMode(isNightTime ? 'day' : 'night')}
+                  className={`px-2.5 py-1 rounded-full font-medium transition-all flex items-center gap-1 ${
+                    timeMode !== 'auto' ? 'bg-amber-500 text-white shadow-sm' : 'hover:opacity-80'
+                  }`}
+                  title="Alternar manualmente Dia/Noite"
+                >
+                  {isNightTime ? <Moon className="w-3.5 h-3.5" /> : <Sun className="w-3.5 h-3.5" />}
+                  <span className="hidden sm:inline">{isNightTime ? 'Noite' : 'Dia'}</span>
+                </button>
+              </div>
+
+              <div className={`flex items-center gap-1 text-sm font-medium px-2.5 py-1 rounded-full border ${
+                isNightTime ? 'bg-slate-900/60 border-slate-700 text-slate-200' : 'bg-white/70 border-amber-200/60 text-[#2D4A3E]'
+              }`}>
+                <MapPin className="w-4 h-4 text-amber-600" /> Xandó
+              </div>
+
+              {isConnected ? (
+                <span className="flex items-center gap-1 bg-emerald-100 text-emerald-800 text-xs px-2.5 py-1 rounded-full font-semibold shadow-sm">
+                  <CheckCircle className="w-3.5 h-3.5" /> Conectado
+                </span>
+              ) : (
+                <button 
+                  onClick={() => setIsModalOpen(true)}
+                  className={`flex items-center gap-1 text-xs px-3.5 py-1.5 rounded-full font-semibold shadow-sm transition-all ${
+                    isNightTime 
+                      ? 'bg-amber-400 text-slate-950 hover:bg-amber-300' 
+                      : 'bg-[#2D4A3E] text-white hover:bg-[#1B3A2E]'
+                  }`}
+                >
+                  <UserPlus className="w-3.5 h-3.5" /> Conectar
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Barra de Pesquisa */}
+          <div className="relative mt-3 mb-2">
+            <Search className={`absolute left-3.5 top-3.5 w-4 h-4 ${
+              isNightTime ? 'text-slate-400' : 'text-amber-800/60'
+            }`} />
+            <input 
+              type="text"
+              placeholder="O que você procura no Xandó ou Nova Caraíva? (Ex: Pescado, Buggy, Açaí...)"
+              className={`w-full pl-10 pr-4 py-3 rounded-2xl text-sm outline-none transition-all shadow-sm border ${
+                isNightTime 
+                  ? 'bg-slate-900/90 border-slate-700 text-white placeholder-slate-400 focus:border-amber-400' 
+                  : 'bg-white/90 border-amber-200 text-[#2D4A3E] placeholder-amber-900/40 focus:border-[#2D4A3E]'
+              }`}
+            />
+          </div>
         </div>
       </header>
 
-      <main className="p-4 max-w-2xl mx-auto">
-        {!isConnected && (
-          <div className="mb-6 bg-gradient-to-r from-[#2D4A3E] to-[#456A5B] text-white p-5 rounded-2xl shadow-md flex flex-col sm:flex-row items-center justify-between gap-4">
+      {/* CORPO DO APLICATIVO - ESTILO RÚSTICO E PRAIANO */}
+      <main className="max-w-4xl mx-auto p-4 space-y-6">
+        
+        {/* Banner de Boas-vindas Rústico */}
+        <div className={`p-5 rounded-3xl border shadow-sm transition-all ${
+          isNightTime 
+            ? 'bg-slate-800/80 border-slate-700 text-slate-100' 
+            : 'bg-[#F7F4EB] border-[#E6DFC5] text-[#2D4A3E]'
+        }`}>
+          <div className="flex items-start justify-between">
             <div>
-              <h2 className="font-bold text-lg mb-1">Faça parte da nossa comunidade!</h2>
-              <p className="text-sm text-gray-200">Conecte-se ao hub Xandó Express para pedir, anunciar ou oferecer serviços locais.</p>
+              <span className={`inline-block text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full mb-2 ${
+                isNightTime ? 'bg-indigo-950 text-indigo-200' : 'bg-[#E8E2CB] text-[#4A5D4E]'
+              }`}>
+                🌴 Vivência Caraíva
+              </span>
+              <h2 className="text-lg font-bold mb-1">Bem-vindo ao coração do Xandó!</h2>
+              <p className={`text-sm ${isNightTime ? 'text-slate-300' : 'text-[#5C5646]'}`}>
+                Delivery nativo, fretes na areia, buggies e utilidades para sua estadia na vila mais charmosa da Bahia.
+              </p>
             </div>
-            <button 
-              onClick={() => setIsModalOpen(true)}
-              className="bg-white text-[#2D4A3E] px-4 py-2 rounded-xl font-semibold text-sm hover:bg-[#FDFBF7] transition-all whitespace-nowrap shadow"
-            >
-              Conectar a esse hub
-            </button>
           </div>
-        )}
+        </div>
 
-        <section className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-          {categories.map((cat) => (
-            <button key={cat.name} className="flex flex-col items-center justify-center p-6 bg-white rounded-2xl shadow-sm border border-[#E8E4D9] hover:border-[#8BA892] transition-all">
-              <div className="mb-2 text-[#2D4A3E]">{cat.icon}</div>
-              <span className="font-semibold text-sm">{cat.name}</span>
-            </button>
-          ))}
-        </section>
+        {/* Categorias */}
+        <div>
+          <h3 className="text-sm font-bold uppercase tracking-wider mb-3 opacity-80 px-1">Explore o Hub</h3>
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+            {categories.map((cat, idx) => (
+              <button 
+                key={idx}
+                className={`p-4 rounded-2xl border flex flex-col items-center justify-center gap-2 transition-all shadow-sm hover:scale-[1.02] active:scale-95 ${
+                  isNightTime 
+                    ? 'bg-slate-800/90 border-slate-700 text-slate-200 hover:bg-slate-750 hover:border-slate-600' 
+                    : 'bg-white border-[#E6DFC5] text-[#2D4A3E] hover:border-[#2D4A3E]/30'
+                }`}
+              >
+                <div className={`p-3 rounded-2xl ${
+                  isNightTime ? 'bg-indigo-950/80 text-amber-300' : 'bg-[#F2EFE9] text-[#2D4A3E]'
+                }`}>
+                  {cat.icon}
+                </div>
+                <span className="text-xs font-semibold">{cat.name}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Destaques / Sugestões da Vila */}
+        <div>
+          <div className="flex justify-between items-center mb-3 px-1">
+            <h3 className="text-sm font-bold uppercase tracking-wider opacity-80">Destaques no Xandó</h3>
+            <span className="text-xs font-medium text-amber-700 dark:text-amber-400 cursor-pointer hover:underline">Ver todos</span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {[1, 2].map((item) => (
+              <div 
+                key={item}
+                className={`p-4 rounded-3xl border shadow-sm transition-all ${
+                  isNightTime 
+                    ? 'bg-slate-800/90 border-slate-700 text-slate-100' 
+                    : 'bg-white border-[#E6DFC5] text-[#3D3A32]'
+                }`}
+              >
+                <div className="flex justify-between items-start mb-2">
+                  <div>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 uppercase">
+                      {item === 1 ? 'Restaurante na Praia' : 'Serviço de Frete'}
+                    </span>
+                    <h4 className="font-bold text-base mt-1">
+                      {item === 1 ? 'Cabana & Sabor do Xandó' : 'Frete 4x4 Areia Fofa'}
+                    </h4>
+                  </div>
+                  <span className="text-xs font-semibold px-2 py-1 rounded-xl bg-emerald-50 text-emerald-800">
+                    {item === 1 ? '⭐ 4.9' : '⚡ Rápido'} 
+                  </span>
+                </div>
+                <p className={`text-xs mb-3 ${isNightTime ? 'text-slate-300' : 'text-[#6B6555]'}`}>
+                  {item === 1 
+                    ? 'Peixe fresco do dia, porções generosas e cerveja gelada à beira mar.' 
+                    : 'Transporte de bagagens e compras da balsa até sua pousada no Xandó.'}
+                </p>
+                <button className={`w-full py-2.5 rounded-xl font-semibold text-xs transition-all shadow-sm ${
+                  isNightTime
+                    ? 'bg-amber-400 text-slate-950 hover:bg-amber-300'
+                    : 'bg-[#2D4A3E] text-white hover:bg-[#1B3A2E]'
+                }`}>
+                  {item === 1 ? 'Ver Cardápio & Pedir' : 'Chamar no WhatsApp'}
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
       </main>
 
+      {/* MODAL DE CONEXÃO AO HUB */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-md rounded-3xl p-6 shadow-xl relative animate-in fade-in zoom-in duration-200">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className={`w-full max-w-md p-6 rounded-3xl shadow-2xl relative border ${
+            isNightTime ? 'bg-slate-900 border-slate-800 text-white' : 'bg-[#FDFBF7] border-[#E6DFC5] text-[#2D4A3E]' 
+          }`}>
             <button 
               onClick={() => setIsModalOpen(false)}
-              className="absolute right-4 top-4 text-gray-400 hover:text-gray-600 p-1"
+              className="absolute right-4 top-4 p-2 rounded-full hover:bg-black/5 text-gray-500"
             >
               <X className="w-5 h-5" />
             </button>
 
             <div className="text-center mb-6">
-              <div className="w-12 h-12 bg-[#F0F4F2] text-[#2D4A3E] rounded-full flex items-center justify-center mx-auto mb-3">
+              <div className="w-12 h-12 bg-amber-100 text-amber-800 rounded-2xl flex items-center justify-center mx-auto mb-2">
                 <UserPlus className="w-6 h-6" />
               </div>
-              <h3 className="text-xl font-bold text-[#1B3A2E]">Conectar ao Xandó Express</h3>
-              <p className="text-sm text-gray-500 mt-1">Preencha seus dados para acessar o hub local.</p>
+              <h3 className="text-lg font-bold">Conecte-se ao Xandó Express</h3>
+              <p className="text-xs text-gray-500 mt-1">
+                Participe da rede de moradores, comerciantes e visitantes da região.
+              </p>
             </div>
 
             <form onSubmit={handleConnect} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-gray-600 uppercase mb-1">Seu Nome</label>
+                <label className="block text-xs font-semibold uppercase mb-1 opacity-70">Seu Nome ou Estabelecimento</label>
                 <input 
                   type="text"
                   required
-                  placeholder="Ex: Maria Silva"
+                  placeholder="Ex: João da Pousada / Marina"
                   value={formData.name}
                   onChange={(e) => setFormData({...formData, name: e.target.value})}
-                  className="w-full px-4 py-2.5 rounded-xl bg-[#F0F4F2] border border-transparent focus:border-[#2D4A3E] outline-none text-sm"
+                  className={`w-full px-4 py-2.5 rounded-xl border text-sm outline-none ${
+                    isNightTime 
+                      ? 'bg-slate-800 border-slate-700 text-white focus:border-amber-400' 
+                      : 'bg-[#F2EFE9] border-transparent focus:border-[#2D4A3E]'
+                  }`}
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-600 uppercase mb-1">WhatsApp / Telefone</label>
+                <label className="block text-xs font-semibold uppercase mb-1 opacity-70">WhatsApp / Telefone</label>
                 <input 
                   type="tel"
                   required
                   placeholder="(73) 99999-9999"
                   value={formData.phone}
                   onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                  className="w-full px-4 py-2.5 rounded-xl bg-[#F0F4F2] border border-transparent focus:border-[#2D4A3E] outline-none text-sm"
+                  className={`w-full px-4 py-2.5 rounded-xl border text-sm outline-none ${
+                    isNightTime 
+                      ? 'bg-slate-800 border-slate-700 text-white focus:border-amber-400' 
+                      : 'bg-[#F2EFE9] border-transparent focus:border-[#2D4A3E]'
+                  }`}
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-600 uppercase mb-1">Você é:</label>
+                <label className="block text-xs font-semibold uppercase mb-1 opacity-70">Você é:</label>
                 <select 
                   value={formData.role}
                   onChange={(e) => setFormData({...formData, role: e.target.value})}
-                  className="w-full px-4 py-2.5 rounded-xl bg-[#F0F4F2] border border-transparent focus:border-[#2D4A3E] outline-none text-sm"
+                  className={`w-full px-4 py-2.5 rounded-xl border text-sm outline-none ${
+                    isNightTime 
+                      ? 'bg-slate-800 border-slate-700 text-white focus:border-amber-400' 
+                      : 'bg-[#F2EFE9] border-transparent focus:border-[#2D4A3E]'
+                  }`}
                 >
                   <option>Cliente / Morador</option>
                   <option>Comerciante / Restaurante</option>
@@ -146,6 +326,14 @@ export default function App() {
           </div>
         </div>
       )}
+
+      {/* Estilos CSS Inline para Animação de Nuvens */}
+      <style>{`
+        @keyframes slideCloud {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(100%); }
+        }
+      `}</style>
     </div>
   );
 }
