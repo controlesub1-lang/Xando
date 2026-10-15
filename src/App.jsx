@@ -6,6 +6,16 @@ export default function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({ name: '', phone: '', role: 'Cliente / Morador' });
   
+  // Concierge States
+  const [isConciergeOpen, setIsConciergeOpen] = useState(false);
+  const [chatInput, setChatInput] = useState('');
+  const [messages, setMessages] = useState([
+    {
+      sender: 'concierge',
+      text: 'Olá, parceiro(a)! Sou o Concierge Xandó Express. Como posso te ajudar hoje em Xandó ou Nova Caraíva?'
+    }
+  ]);
+  
   // Modo do cabeçalho dinâmico: 'auto', 'day', 'night'
   const [timeMode, setTimeMode] = useState('auto');
   const [isNightTime, setIsNightTime] = useState(false);
@@ -34,6 +44,33 @@ export default function App() {
       setIsConnected(true);
       setIsModalOpen(false);
     }
+  };
+
+  const handleSendMessage = (e) => {
+    e.preventDefault();
+    if (!chatInput.trim()) return;
+
+    const userMsg = chatInput;
+    const updatedMessages = [...messages, { sender: 'user', text: userMsg }];
+    setMessages(updatedMessages);
+    setChatInput('');
+
+    setTimeout(() => {
+      let reply = 'Estou aqui para ajudar com delivery, fretes, passeios e dicas em Xandó e Nova Caraíva. Como posso te orientar?';
+      const lower = userMsg.toLowerCase();
+
+      if (lower.includes('delivery') || lower.includes('comida') || lower.includes('mercado') || lower.includes('pedir')) {
+        reply = 'Fazer seu pedido no novo Xandó Express is super prático! Acesse a aba \'Delivery\' no menu principal, escolha o restaurante ou mercado parceiro, monte seu carrinho e envie o pedido diretamente. Quer que eu te direcione para as opções abertas agora?';
+      } else if (lower.includes('transporte') || lower.includes('frete') || lower.includes('bagagem') || lower.includes('quadriciclo') || lower.includes('buggy') || lower.includes('mala')) {
+        reply = 'Precisa se deslocar ou transportar malas no Xandó ou Nova Caraíva? Na aba \'Fretes & Transporte\', você encontra condutores credenciados de quadriciclos e buggies para alinhar o atendimento com rapidez e segurança. Posso te levar até lá?';
+      } else if (lower.includes('parceiro') || lower.includes('cadastro') || lower.includes('cadastrar') || lower.includes('restaurante') || lower.includes('pousada')) {
+        reply = 'Seja muito bem-vindo ao Xandó Express! Cadastrar seu restaurante, pousada, frete ou passeio na nossa nova plataforma é a melhor forma de vender mais na alta e baixa temporada. Basta acessar a seção \'Seja um Parceiro\' e preencher o formulário rápido. Nossa equipe entrará em contato em breve!';
+      } else if (lower.includes('custo') || lower.includes('gratuito') || lower.includes('taxa') || lower.includes('pagar') || lower.includes('grátis')) {
+        reply = 'O uso do Xandó Express é **100% gratuito** para turistas e moradores! Você navega pelo guia, escolhe os serviços e faz seus pedidos sem pagar taxa de assinatura ou inscrição.';
+      }
+
+      setMessages(prev => [...prev, { sender: 'concierge', text: reply }]);
+    }, 600);
   };
 
   return (
@@ -326,6 +363,99 @@ export default function App() {
           </div>
         </div>
       )}
+
+      {/* BOTÃO FLUTUANTE DO CONCIERGE XANDÓ EXPRESS */}
+      <div className="fixed bottom-5 right-5 z-50">
+        <button
+          onClick={() => setIsConciergeOpen(!isConciergeOpen)}
+          className={`flex items-center gap-2 px-4 py-3 rounded-full shadow-xl transition-all duration-300 font-medium text-sm ${
+            isNightTime
+              ? 'bg-amber-400 text-slate-950 hover:bg-amber-300 shadow-amber-500/20'
+              : 'bg-[#2D4A3E] text-[#FDFBF7] hover:bg-[#233a30] shadow-emerald-950/25'
+          }`}
+        >
+          <Sparkles className="w-5 h-5 animate-pulse text-amber-300" />
+          <span>Concierge Xandó</span>
+        </button>
+
+        {/* MODAL / CHAT DO CONCIERGE */}
+        {isConciergeOpen && (
+          <div className={`absolute bottom-16 right-0 w-80 sm:w-96 rounded-2xl shadow-2xl border flex flex-col overflow-hidden transition-all duration-300 ${
+            isNightTime
+              ? 'bg-slate-900 border-slate-700 text-slate-100'
+              : 'bg-white border-amber-200 text-[#3D3A32]'
+          }`}>
+            {/* Cabeçalho do Chat */}
+            <div className={`p-4 flex items-center justify-between border-b ${
+              isNightTime ? 'bg-slate-800 border-slate-700' : 'bg-amber-50 border-amber-100'
+            }`}>
+              <div className="flex items-center gap-2">
+                <div className="p-2 rounded-xl bg-amber-500 text-white">
+                  <Sparkles className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-sm">Concierge Xandó Express</h3>
+                  <p className="text-[10px] opacity-75">Seu assistente virtual oficial</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsConciergeOpen(false)}
+                className="p-1.5 rounded-full hover:bg-black/10 transition"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Corpo das Mensagens */}
+            <div className="p-4 h-80 overflow-y-auto flex flex-col gap-3 text-xs">
+              {messages.map((m, idx) => (
+                <div
+                  key={idx}
+                  className={`max-w-[85%] p-3 rounded-2xl leading-relaxed ${
+                    m.sender === 'user'
+                      ? 'ml-auto bg-amber-500 text-white rounded-br-sm'
+                      : isNightTime
+                        ? 'mr-auto bg-slate-800 text-slate-200 rounded-bl-sm border border-slate-700'
+                        : 'mr-auto bg-[#F2EFE9] text-[#3D3A32] rounded-bl-sm'
+                  }`}
+                >
+                  {m.text}
+                </div>
+              ))}
+            </div>
+
+            {/* Input de Envio */}
+            <form onSubmit={handleSendMessage} className={`p-3 border-t flex gap-2 ${
+              isNightTime ? 'bg-slate-800 border-slate-700' : 'bg-amber-50/50 border-amber-100'
+            }`}>
+              <input
+                type="text"
+                value={chatInput}
+                onChange={(e) => setChatInput(e.target.value)}
+                placeholder="Digite sua dúvida sobre o Xandó..."
+                className={`flex-1 px-3 py-2 rounded-xl text-xs outline-none border ${
+                  isNightTime
+                    ? 'bg-slate-900 border-slate-700 text-white focus:border-amber-400'
+                    : 'bg-white border-amber-200 text-[#3D3A32] focus:border-[#2D4A3E]'
+                }`}
+              />
+              <button
+                type="submit"
+                className="px-4 py-2 bg-amber-500 text-white rounded-xl text-xs font-semibold hover:bg-amber-600 transition"
+              >
+                Enviar
+              </button>
+            </form>
+          </div>
+        )}
+      </div>
+
+      {/* FOOTER OU INFO FINAL */}
+      <footer className={`py-8 text-center text-xs transition-colors duration-700 ${
+        isNightTime ? 'text-slate-500 border-t border-slate-800' : 'text-amber-900/40 border-t border-amber-100' 
+      }`}>
+        <p>© Xandó Express • Caraíva e Xandó - BA</p>
+      </footer>
 
       {/* Estilos CSS Inline para Animação de Nuvens */}
       <style>{`
