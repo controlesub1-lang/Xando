@@ -2,40 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { MapPin, ShoppingBag, Search, Truck, Utensils, Store, Compass, Info, CheckCircle, UserPlus, X, Sun, Moon, Cloud, Sparkles } from 'lucide-react';
 
 export default function App() {
-  const [isConnected, setIsConnected] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [formData, setFormData] = useState({ name: '', phone: '', role: 'Cliente / Morador' });
-  
-  // Concierge States
-  const [isConciergeOpen, setIsConciergeOpen] = useState(false);
-  const [chatInput, setChatInput] = useState('');
-  const [messages, setMessages] = useState([
-    {
-      sender: 'concierge',
-      text: 'Olá, parceiro(a)! Sou o Concierge Xandó Express. Como posso te ajudar hoje em Xandó ou Nova Caraíva?'
-    }
-  ]);
-  
-  // Modo do cabeçalho dinâmico: 'auto', 'day', 'night'
-  const [timeMode, setTimeMode] = useState('auto');
-  const [isNightTime, setIsNightTime] = useState(false);
-
-  useEffect(() => {
-    if (timeMode === 'auto') {
-      const hour = new Date().getHours();
-      // Noite entre 18h e 6h
-      setIsNightTime(hour < 6 || hour >= 18);
-    } else {
-      setIsNightTime(timeMode === 'night');
-    }
-  }, [timeMode]);
-
-  const categories = [
-    { name: 'Delivery', icon: <Utensils className="w-6 h-6" /> },
-    { name: 'Mercados', icon: <Store className="w-6 h-6" /> },
-    { name: 'Fretes', icon: <Truck className="w-6 h-6" /> },
-    { name: 'Passeios', icon: <Compass className="w-6 h-6" /> },
-    { name: 'Guia Útil', icon: <Info className="w-6 h-6" /> },
+  return (
+    <div className="min-h-screen bg-[#121212] text-gray-100 p-6 font-sans">
+      <header className="mb-10 text-center">
+        <h1 className="text-3xl font-black text-amber-500 uppercase tracking-tighter">Royal Barber</h1>
+        <p className="text-gray-500 text-sm mt-2">Estilo e precisão em cada detalhe.</p>
+      </header>
+  const services = [
+    { name: 'Corte Degradê', price: 'R$ 60' },
+    { name: 'Barba Premium', price: 'R$ 45' },
+    { name: 'Combo Completo', price: 'R$ 95' },
+    { name: 'Sobrancelha', price: 'R$ 20' }
   ];
 
   const handleConnect = (e) => {
@@ -208,28 +185,14 @@ export default function App() {
           </div>
         </div>
 
-        {/* Categorias */}
-        <div>
-          <h3 className="text-sm font-bold uppercase tracking-wider mb-3 opacity-80 px-1">Explore o Hub</h3>
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-            {categories.map((cat, idx) => (
-              <button 
-                key={idx}
-                className={`p-4 rounded-2xl border flex flex-col items-center justify-center gap-2 transition-all shadow-sm hover:scale-[1.02] active:scale-95 ${
-                  isNightTime 
-                    ? 'bg-slate-800/90 border-slate-700 text-slate-200 hover:bg-slate-750 hover:border-slate-600' 
-                    : 'bg-white border-[#E6DFC5] text-[#2D4A3E] hover:border-[#2D4A3E]/30'
-                }`}
-              >
-                <div className={`p-3 rounded-2xl ${
-                  isNightTime ? 'bg-indigo-950/80 text-amber-300' : 'bg-[#F2EFE9] text-[#2D4A3E]'
-                }`}>
-                  {cat.icon}
-                </div>
-                <span className="text-xs font-semibold">{cat.name}</span>
-              </button>
-            ))}
-          </div>
+        <div className="space-y-4">
+          <h3 className="text-amber-500 font-bold uppercase tracking-widest text-sm">Serviços</h3>
+          {services.map((s, i) => (
+            <div key={i} className="flex justify-between items-center p-4 bg-[#1a1a1a] border border-[#333] rounded-xl">
+              <span className="text-gray-200 font-medium">{s.name}</span>
+              <span className="text-amber-500 font-bold">{s.price}</span>
+            </div>
+          ))}
         </div>
 
         {/* Destaques / Sugestões da Vila */}
